@@ -3,7 +3,6 @@
 For instructions!
 
 1. You are must add next files:
-
 .env.development   --inside-->   PGDATABASE=<dbName>
 .env.test          --inside-->   PGDATABASE=<dbNameTest>
 
