@@ -4,8 +4,8 @@ For instructions!
 
 1. You are must add next files:
 
-.env.development   --inside-->   PGDATABASE=nc_news
-.env.test          --inside-->   PGDATABASE=nc_news_tes
+.env.development   --inside-->   PGDATABASE=<dbName>
+.env.test          --inside-->   PGDATABASE=<dbNameTest>
 
 2. You'll need to run npm install.
 
