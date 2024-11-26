@@ -1,9 +1,9 @@
-const db = require('../db/connection');
+const fetchTopics = require("../moduls/topics.moduls");
 
 function getTopics(req, res, next) {
-  db.query('SELECT * FROM topics;')
-    .then(({ rows }) => {
-      res.status(200).send({ topics: rows });
+  fetchTopics()
+    .then((topics) => {
+      res.status(200).send({ topics });
     })
     .catch(next);
 }
