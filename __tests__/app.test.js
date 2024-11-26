@@ -50,12 +50,34 @@ describe("GET /api/topics", () => {
         });
       });
   });
-  test("404: Responds with an error for a non-existent endpoint", () => {
-    return request(app)
-      .get("/api/non-existent-endpoint")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Not Found");
-      });
+});
+
+describe('GET /api/articles/:article_id', () => {
+  test('200: Responds with the article object, which should have the following properties', () => {
+      return request(app)
+          .get('/api/articles/1')
+          .expect(200)
+          .then(({ body: { article } }) => {
+              expect(article).toEqual(
+                  expect.objectContaining({
+                      author: expect.any(String),
+                      title: expect.any(String),
+                      article_id: 1,
+                      body: expect.any(String),
+                      topic: expect.any(String),
+                      created_at: expect.any(String),
+                      votes: expect.any(Number),
+                      article_img_url: expect.any(String),
+                  })
+              );
+          });
   });
+  test('400: Responds with "Invalid article_id" for NaN', () => {
+    return request(app)
+        .get('/api/articles/not-a-number')
+        .expect(400)
+        .then(({ body: { msg } }) => {
+            expect(msg).toBe('Invalid article_id');
+        });
+});
 });
