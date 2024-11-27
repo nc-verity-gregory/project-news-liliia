@@ -126,5 +126,48 @@ describe('GET /api/articles/:article_id', () => {
         .then(({ body: { msg } }) => {
             expect(msg).toBe('Invalid article_id');
         });
+  });
 });
+
+describe('GET /api/articles/:article_id/comments', () => {
+  test('200: Responds - each comment should have the correct structure', () => {
+    const article_id = 1; 
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              article_id: article_id, 
+            })
+          );
+        });
+      });
+  });
+  test('200: Responds with an array of comments for article_id + msg if there no comments', () => {
+    const article_id = 0;
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(Array.isArray(comments)).toBe(true); 
+        expect(comments).toHaveLength(0); 
+      });
+  });
+  test('200: Responds with the comments in the correct order (last is first)', () => {
+    const article_id = 1; 
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments[0].comment_id).toBeGreaterThan(comments[1].comment_id); 
+      });
+  });
 });
+
