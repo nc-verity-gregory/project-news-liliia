@@ -11,14 +11,15 @@ function getArticleById(req, res, next) {
         .then((article) => {
             res.status(200).send({ article });
         })
-        .catch(next);
+        .catch(err => {
+            next({ status: 404, msg: 'Article not found' });
+          });
 };
 
 function getArticles(req, res, next) {
     fetchArticles()
         .then((articles) => {
-            const deleteBody = articles.map(({ body, ...rest }) => rest);
-            res.status(200).send({ articles: deleteBody });
+            res.status(200).send({ articles });
         })
         .catch(next);
 };
