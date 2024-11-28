@@ -5,6 +5,11 @@ const getTopics = require('./controllers/topics.controller');
 const { getArticleById, getArticles } = require('./controllers/articles.controller');
 const getCommentsByArticleId = require('./controllers/comments.controller');
 
+app.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
+  });
+  
+
 app.use(express.json());
 
 app.get('/api', getApi);

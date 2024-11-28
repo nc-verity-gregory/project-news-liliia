@@ -150,7 +150,7 @@ describe('GET /api/articles/:article_id/comments', () => {
         });
       });
   });
-  test('200: Responds with an array of comments for article_id + msg if there no comments', () => {
+  test('200: Responds with an array of comments for article_id', () => {
     const article_id = 0;
     return request(app)
       .get(`/api/articles/${article_id}/comments`)
