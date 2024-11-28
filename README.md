@@ -47,7 +47,7 @@ This project includes tests for all endpoints and db functional.
  jest-extended
  jest-sorted
 
-## Endpoints
+## Endpoints - GET
 
 1. GET /api
 Description: Returns an object detailing the documentation for each endpoint.
@@ -123,6 +123,33 @@ Example response:
   ]
 }
 
+## Endpoints - POST
+
+1. POST /api/articles/:article_id/comments
+Description:
+This endpoint allows a user to add a comment to a specific article.
+
+Example Request:
+{
+  "username": "butter_bridge",
+  "body": "Great article!"
+}
+
+Example Response:
+{
+  "comment": {
+    "comment_id": 1,
+    "votes": 0,
+    "created_at": "2024-11-28T12:34:56.000Z",
+    "author": "butter_bridge",
+    "body": "Great article!",
+    "article_id": 1
+  }
+}
+
+
+
+
 ## Project modules:
 
     express
@@ -136,8 +163,5 @@ Example response:
     pg-format
     husky
 
-
-
-//////////////////////
 
 This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)

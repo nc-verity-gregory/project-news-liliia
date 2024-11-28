@@ -29,6 +29,10 @@
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments for a given article",
     "queries": [],
+    "exampleRequestBody": {
+            "username": "butter_bridge",
+            "body": "Great article!"
+        },
     "exampleResponse": {
         "comments": [
             {
