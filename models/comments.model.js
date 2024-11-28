@@ -9,9 +9,6 @@ function fetchCommentsByArticleId(article_id) {
       [article_id]
     )
     .then(({ rows }) => {
-        if (rows.length === 0) {
-          return [];
-        }
         return rows;
     });
 };
@@ -25,10 +22,7 @@ function insertCommentByArticleId(article_id, username, body) {
       `,
       [article_id, username, body]
   ).then(({ rows }) => {
-    if (rows.length === 0) {
-      throw new Error('Article not found');
-    }
-    return rows[0];
+     return rows[0];
   });
 }
 

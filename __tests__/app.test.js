@@ -4,6 +4,9 @@ const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
 const request = require('supertest');
 const app = require('../app');
+const toBeSortedBy = require('jest-sorted');
+expect.extend(toBeSortedBy);
+
 
 
 
@@ -145,6 +148,7 @@ describe("GET - Endpoints", () => {
         .get(`/api/articles/${article_id}/comments`)
         .expect(200)
         .then(({ body: { comments } }) => {
+          expect(comments.length).toBeGreaterThan(0);  // if NOT empty
           comments.forEach((comment) => {
             expect(comment).toEqual(
               expect.objectContaining({
@@ -159,14 +163,13 @@ describe("GET - Endpoints", () => {
           });
         });
     });
-    test('200: Responds with an array of comments for article_id', () => {
-      const article_id = 0;
+    test('200: Responds with an array of comments for article_id without comments (empty Arr)', () => {
+      const article_id = 37;  // this article_id has no comments
       return request(app)
         .get(`/api/articles/${article_id}/comments`)
         .expect(200)
         .then(({ body: { comments } }) => {
-          expect(Array.isArray(comments)).toBe(true); 
-          expect(comments).toHaveLength(0); 
+          expect(comments).toEqual([]);
         });
     });
     test('200: Responds with the comments in the correct order (last is first)', () => {
@@ -174,8 +177,8 @@ describe("GET - Endpoints", () => {
       return request(app)
         .get(`/api/articles/${article_id}/comments`)
         .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments[0].comment_id).toBeGreaterThan(comments[1].comment_id); 
+        .then(({ body: { comments } }) => { // sorted by 'jest-sorted'
+          expect(comments).toBeSortedBy('created_at', { descending: true });
         });
     });
   });
