@@ -1,26 +1,6 @@
 # Northcoders News API
 
 ## Description
-
-NC News is a API that provides access to news articles, comments, and topics. 
-It is built using **Node.js**, **Express**, and **PostgreSQL**.
-
-## Installation
-
-To run this project locally:
-
-1. **Clone the repository:**
-    
-    ```bash
-    git clone <repository_url>
-    cd <repository_directory>
-    
-    ```
-    
-
-//----------------------
-NC News API
-## Description
 NC News is a API that provides access to news articles, comments, and topics. 
 It is built using Node.js, Express, and PostgreSQL.
 
