@@ -9,8 +9,8 @@ To run this project locally:
 
 1. Clone the repository:
 
- git clone <repository_url>
- cd <repository_directory>
+ git clone 'repository_url'
+ cd 'repository_directory'
 
 2. Install dependencies:
 
@@ -19,8 +19,8 @@ To run this project locally:
 3. Set up environment files:
 
  You are must add next files:
-.env.development   --inside-->   PGDATABASE=<dbName>
-.env.test          --inside-->   PGDATABASE=<dbNameTest>
+.env.development   --inside-->   PGDATABASE= 'dbName'
+.env.test          --inside-->   PGDATABASE= 'dbNameTest'
 
 4. Set up databases:
 

@@ -4,6 +4,9 @@ const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
 const request = require('supertest');
 const app = require('../app');
+const toBeSortedBy = require('jest-sorted');
+expect.extend(toBeSortedBy);
+
 
 
 
@@ -145,6 +148,7 @@ describe("GET - Endpoints", () => {
         .get(`/api/articles/${article_id}/comments`)
         .expect(200)
         .then(({ body: { comments } }) => {
+          expect(comments.length).toBeGreaterThan(0);  // if NOT empty
           comments.forEach((comment) => {
             expect(comment).toEqual(
               expect.objectContaining({
@@ -159,14 +163,13 @@ describe("GET - Endpoints", () => {
           });
         });
     });
-    test('200: Responds with an array of comments for article_id', () => {
-      const article_id = 0;
+    test('200: Responds with an array of comments for article_id without comments (empty Arr)', () => {
+      const article_id = 37;  // this article_id has no comments
       return request(app)
         .get(`/api/articles/${article_id}/comments`)
         .expect(200)
         .then(({ body: { comments } }) => {
-          expect(Array.isArray(comments)).toBe(true); 
-          expect(comments).toHaveLength(0); 
+          expect(comments).toEqual([]);
         });
     });
     test('200: Responds with the comments in the correct order (last is first)', () => {
@@ -174,8 +177,8 @@ describe("GET - Endpoints", () => {
       return request(app)
         .get(`/api/articles/${article_id}/comments`)
         .expect(200)
-        .then(({ body: { comments } }) => {
-          expect(comments[0].comment_id).toBeGreaterThan(comments[1].comment_id); 
+        .then(({ body: { comments } }) => { // sorted by 'jest-sorted'
+          expect(comments).toBeSortedBy('created_at', { descending: true });
         });
     });
   });
@@ -184,29 +187,110 @@ describe("GET - Endpoints", () => {
 describe('POST - Endpoints', () => {
   describe('POST /api/articles/:article_id/comments', () => {
     test('201: Responds with the posted comment', () => {
-        return request(app)
-            .post('/api/articles/1/comments')
-            .send({ username: 'butter_bridge', body: 'Great article!' })
-            .expect(201)
-            .then(({ body: { comment } }) => {
-                expect(comment).toMatchObject({
-                    comment_id: expect.any(Number),
-                    body: 'Great article!',
-                    article_id: 1,
-                    author: 'butter_bridge',
-                    votes: 0,
-                    created_at: expect.any(String),
-                });
-            });
-    });
-    test('400: Responds with "Bad request" when missing username or body', () => {
+      const newComment = { username: 'butter_bridge', body: 'Great article!' };
       return request(app)
-          .post('/api/articles/1/comments')
-          .send({ username: 'some_name' })
-          .expect(400)
-          .then(({ body: { msg } }) => {
-              expect(msg).toBe('Bad request: missing username or body');
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment).toEqual({
+            comment_id: expect.any(Number),
+            body: 'Great article!',
+            article_id: 1,
+            author: 'butter_bridge',
+            votes: 0,
+            created_at: expect.any(String),
           });
+        });
+    });
+    test('400: Responds with an error if username/body is missing', () => {
+      const newComment = { body: 'Great article!' };
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad request: missing username or body');
+        });
+    });
+    test('400: Responds with an error if article_id is not a number', () => {
+      const newComment = { username: 'butter_bridge', body: 'Great article!' };
+      return request(app)
+        .post('/api/articles/not-a-number/comments')
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid article_id');
+        });
+    });
+
+    test('404: Responds with an error if article_id does not exist', () => {
+      const newComment = { username: 'butter_bridge', body: 'Great article!' };
+      return request(app)
+        .post('/api/articles/9999/comments')
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Article not found');
+        });
+    });
+
+    test('404: Responds with an error if username does not exist', () => {
+      const newComment = { username: 'nonexistUser', body: 'Great article!' };
+      return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('User not found');
+        });
+    });
+
+
+  });
+});
+
+describe('PATCH - Endpoints', () => {
+  describe('PATCH /api/articles/:article_id', () => {
+    test('200: Responds with successfully updates the votes for an article', () => {
+      const updatedVotes = { inc_votes: 5 };
+      return request(app)
+        .patch('/api/articles/1')
+        .send(updatedVotes)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.votes).toBeGreaterThanOrEqual(0);
+          expect(body.article.article_id).toBe(1);
+        });
+    });
+    test('400: Responds with an error if article_id is invalid', () => {
+      const updatedVotes = { inc_votes: 1 };
+      return request(app)
+        .patch('/api/articles/not-a-number')
+        .send(updatedVotes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid article_id');
+        });
+    });
+    test('404: Responds with an error if article_id does not exist', () => {
+      const updatedVotes = { inc_votes: 1 };
+      return request(app)
+        .patch('/api/articles/9999')
+        .send(updatedVotes)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Article not found');
+        });
+    });
+    test('400: Responds with an error if inc_votes is not provided', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({}) 
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad request: inc_votes must be a number');
+        });
     });
   });
 });
