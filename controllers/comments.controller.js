@@ -18,6 +18,10 @@ function postCommentByArticleId(req, res, next) {
   const { article_id } = req.params;
   const { username, body } = req.body;
 
+  if (isNaN(article_id)) {
+    return res.status(400).send({ msg: 'Invalid article_id' });
+  }
+
   if (!username || !body) {
       res.status(400).send({ msg: 'Bad request: missing username or body' });
       return;
