@@ -294,3 +294,32 @@ describe('PATCH - Endpoints', () => {
     });
   });
 });
+
+describe('PATCH - Endpoints', () => {
+  describe('DELETE /api/comments/:comment_id', () => {
+    test('204: Comment deleted', () => {
+      return request(app)
+        .delete('/api/comments/1')
+        .expect(204);
+    });
+  
+    test('404: Responds with an error if comment_id does not exist', () => {
+      return request(app)
+        .delete('/api/comments/9999')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Comment not found');
+        });
+    });
+  
+    test('400: Responds with an error if comment_id is not a number', () => {
+      return request(app)
+        .delete('/api/comments/not-a-number')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid comment_id');
+        });
+    });
+  });
+
+});

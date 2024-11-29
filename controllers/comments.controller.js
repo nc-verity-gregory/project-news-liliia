@@ -1,6 +1,7 @@
 const { 
   fetchCommentsByArticleId,
-  insertCommentByArticleId
+  insertCommentByArticleId,
+  deleteCommentById
  } = require('../models/comments.model');
 
 
@@ -12,7 +13,7 @@ function getCommentsByArticleId(req, res, next) {
       res.status(200).send({ comments });
     })
     .catch(next);
-}
+};
 
 function postCommentByArticleId(req, res, next) {
   const { article_id } = req.params;
@@ -32,6 +33,20 @@ function postCommentByArticleId(req, res, next) {
           res.status(201).send({ comment });
       })
       .catch(next);
+};
+
+function deleteCommentByIdController(req, res, next) {
+  const { comment_id } = req.params;
+
+  if (isNaN(comment_id)) {
+    return res.status(400).send({ msg: 'Invalid comment_id' });
+  }
+
+  deleteCommentById(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch(next);
 }
 
-module.exports = { getCommentsByArticleId, postCommentByArticleId };
+module.exports = { getCommentsByArticleId, postCommentByArticleId, deleteCommentByIdController };
