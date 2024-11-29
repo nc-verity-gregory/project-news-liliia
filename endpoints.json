@@ -86,5 +86,25 @@
       "comment_id": 1
     },
     "exampleResponse": null
+  },
+  "/api/users": {
+    "GET": {
+      "description": "Fetches an array of all users",
+      "queries": [],
+      "exampleResponse": {
+        "users": [
+          {
+            "username": "butter_bridge",
+            "name": "Jonny",
+            "avatar_url": "https://www.avatars.com/butter_bridge"
+          },
+          {
+            "username": "icellusedkars",
+            "name": "Sam",
+            "avatar_url": "https://www.avatars.com/icellusedkars"
+          }
+        ]
+      }
+    }
   }
 }
