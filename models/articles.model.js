@@ -11,7 +11,24 @@ function fetchArticleById(article_id) {
         });
 };
 
-function fetchArticles() {
+function fetchArticles(sort_by, order) {
+    if (!sort_by) {
+        sort_by = 'created_at';
+    }
+    if (!order) {
+        order = 'desc';
+    }
+    const validSortColumns = ['article_id', 'title', 'topic', 'author', 'created_at', 'votes'];
+    const validOrders = ['asc', 'desc'];
+
+    if (!validSortColumns.includes(sort_by)) {
+        return Promise.reject({ status: 400, msg: 'Invalid sort_by column' });
+    }
+
+    if (!validOrders.includes(order)) {
+        return Promise.reject({ status: 400, msg: 'Invalid order query' });
+    }
+
     return db.query(
         `SELECT 
             articles.author, 
@@ -21,18 +38,18 @@ function fetchArticles() {
             articles.created_at, 
             articles.votes, 
             articles.article_img_url,
-            COUNT(comments.comment_id) AS comment_count FROM articles
+            COUNT(comments.comment_id) AS comment_count
+        FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
-        ORDER BY articles.created_at DESC;
-        `
+        ORDER BY ${sort_by} ${order};`
     ).then(({ rows }) => {
         return rows.map((article) => ({
             ...article,
             comment_count: Number(article.comment_count),
         }));
     });
-};
+}
 
 function updateArticleVotes(article_id, inc_votes) {
     return db.query(

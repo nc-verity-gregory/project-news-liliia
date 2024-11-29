@@ -102,6 +102,57 @@ describe("GET - Endpoints", () => {
     });
   });
 
+  describe('GET /api/articles (sorting queries)', () => {
+    test('200: Responds with articles sorted by default column (created_at) in des-order', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toBeInstanceOf(Array);
+          expect(articles).toBeSortedBy('created_at', { descending: true });
+        });
+    });
+    test('200: Responds with articles sorted by any valid column in asc-order', () => {
+      return request(app)
+        .get('/api/articles?sort_by=title&order=asc')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toBeSortedBy('title', { ascending: true });
+        });
+    });
+    test('200: Defaults to des-order if order is not declared', () => {
+      return request(app)
+        .get('/api/articles?sort_by=votes')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toBeSortedBy('votes', { descending: true });
+        });
+    });
+    describe('GET /api/articles (sorting queries) - Errors', () => {
+      test('400: Responds with an err if sort_by column is invalid', () => {
+        return request(app)
+          .get('/api/articles?sort_by=invalid_column')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Invalid sort_by column');
+          });
+      });
+    
+      test('400: Responds with an err if order query is invalid', () => {
+        return request(app)
+          .get('/api/articles?order=invalid_order')
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe('Invalid order query');
+          });
+      });
+    });
+  });
+
+
   describe('GET /api/articles/:article_id', () => {
     test('200: Responds with the article object, which should have the following properties', () => {
         return request(app)
@@ -271,7 +322,7 @@ describe('POST - Endpoints', () => {
 
 describe('PATCH - Endpoints', () => {
   describe('PATCH /api/articles/:article_id', () => {
-    test('200: Responds with successfully updates the votes for an article', () => {
+    test('200: The votes was successfully updated for an article', () => {
       const updatedVotes = { inc_votes: 5 };
       return request(app)
         .patch('/api/articles/1')
@@ -282,14 +333,47 @@ describe('PATCH - Endpoints', () => {
           expect(body.article.article_id).toBe(1);
         });
     });
-    test('400: Responds with an error if article_id is invalid', () => {
+    test('200: The votes was incremented for an article', () => {
+      const updatedVotes = { inc_votes: 5 };
+      return request(app)
+        .patch('/api/articles/1')
+        .send(updatedVotes)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.votes).toBeGreaterThanOrEqual(105);
+          expect(body.article.article_id).toBe(1);
+        });
+    });
+    test('200: The votes was decreased for an article', () => {
+      const updatedVotes = { inc_votes: -10 };
+      return request(app)
+        .patch('/api/articles/1')
+        .send(updatedVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article.votes).toBe(90);
+          expect(article.article_id).toBe(1);
+        });
+    });
+    test('400: Responds with an error if article_id is invalid (not a number)', () => {
       const updatedVotes = { inc_votes: 1 };
       return request(app)
         .patch('/api/articles/not-a-number')
         .send(updatedVotes)
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe('Invalid article_id');
+          expect(body.msg).toBe('Bad request: Invalid input data type');
+        });
+    });
+    test('400: Responds with error for invalid inc_votes value (not a number)', () => {
+      const updatedVotes = { inc_votes: 'not-a-number' };
+      return request(app)
+        .patch('/api/articles/1')
+        .send(updatedVotes)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad request: Invalid input data type');
         });
     });
     test('404: Responds with an error if article_id does not exist', () => {
@@ -308,7 +392,7 @@ describe('PATCH - Endpoints', () => {
         .send({}) 
         .expect(400)
         .then(({ body }) => {
-          expect(body.msg).toBe('Bad request: inc_votes must be a number');
+          expect(body.msg).toBe('Bad request: Invalid input');
         });
     });
   });

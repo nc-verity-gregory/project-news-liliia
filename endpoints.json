@@ -106,5 +106,26 @@
         ]
       }
     }
+  },
+  "/api/articles": {
+    "GET": {
+      "description": "Returns a list of all articles (queries to sort and order )",
+      "queries": {
+        "sort_by": "Sorts the articles by any valid column (defaults - 'created_at')",
+        "order": "Sort order: 'asc', 'desc' (defaults - 'desc')."
+      },
+      "exampleResponse": {
+        "articles": [
+          {
+            "article_id": 1,
+            "title": "Living in the shadow of a great man",
+            "topic": "mitch",
+            "author": "butter_bridge",
+            "created_at": "2020-07-09T20:11:00.000Z",
+            "votes": 100
+          }
+        ]
+      }
+    }
   }
 }
