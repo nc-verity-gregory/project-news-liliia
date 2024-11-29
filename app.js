@@ -31,15 +31,18 @@ app.all('*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
-    if (err.status && err.msg) {
-      res.status(err.status).send({ msg: err.msg });
-    } 
-});
+  if (err.code === '23502') { 
+    return res.status(400).send({ msg: 'Bad request: Invalid input' });
+  }
 
-app.use((err, req, res, next) => {
-  if (err.status) {
+  if (err.code === '22P02') { 
+    return res.status(400).send({ msg: 'Bad request: Invalid input data type' });
+  }
+
+  if (err.status && err.msg) {
     return res.status(err.status).send({ msg: err.msg });
   }
+
   res.status(500).send({ msg: 'Server Error' });
 });
 

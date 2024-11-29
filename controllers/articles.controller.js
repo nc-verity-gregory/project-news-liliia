@@ -21,7 +21,9 @@ function getArticleById(req, res, next) {
 };
 
 function getArticles(req, res, next) {
-    fetchArticles()
+    const { sort_by, order } = req.query;
+
+    fetchArticles(sort_by, order)
         .then((articles) => {
             res.status(200).send({ articles });
         })
@@ -31,14 +33,6 @@ function getArticles(req, res, next) {
 function patchArticleVotes(req, res, next) {
     const { article_id } = req.params;
     const { inc_votes } = req.body;
-
-    if (isNaN(article_id)) {
-        return res.status(400).send({ msg: 'Invalid article_id' });
-    }
-
-    if (typeof inc_votes !== 'number') {
-        return res.status(400).send({ msg: 'Bad request: inc_votes must be a number' });
-    }
 
     updateArticleVotes(article_id, inc_votes)
         .then((updatedArticle) => {
