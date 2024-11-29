@@ -182,6 +182,25 @@ describe("GET - Endpoints", () => {
         });
     });
   });
+  describe('GET /api/users', () => {
+    test('200: Responds with an array of user objects, each having username, name, and avatar_url', () => {
+      return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.users).toBeInstanceOf(Array);
+          body.users.forEach((user) => {
+            expect(user).toEqual(
+              expect.objectContaining({
+                username: expect.any(String),
+                name: expect.any(String),
+                avatar_url: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+  });
 });
 
 describe('POST - Endpoints', () => {
@@ -295,7 +314,7 @@ describe('PATCH - Endpoints', () => {
   });
 });
 
-describe('PATCH - Endpoints', () => {
+describe('DELETE - Endpoints', () => {
   describe('DELETE /api/comments/:comment_id', () => {
     test('204: Comment deleted', () => {
       return request(app)
@@ -321,5 +340,5 @@ describe('PATCH - Endpoints', () => {
         });
     });
   });
-
 });
+
