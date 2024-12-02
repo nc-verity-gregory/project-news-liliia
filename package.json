@@ -6,7 +6,7 @@
   "scripts": {
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "node ./db/seeds/run-seed.js",
-    "test": "jest",
+    "test": "NODE_ENV=test jest",
     "prepare": "husky install",
     "start": "node app.js"
   },
@@ -39,5 +39,8 @@
       "jest-extended/all",
       "jest-sorted"
     ]
-  }
+  },
+  "engines": {
+  "node": "23.x"
+}
 }
