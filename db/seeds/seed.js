@@ -113,7 +113,11 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
         )
       );
       return db.query(insertCommentsQueryStr);
-    });
+    }).catch( (err) => {
+      console.log(err);
+    }
+
+    )
 };
 
 module.exports = seed;
